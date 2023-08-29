@@ -28,6 +28,7 @@ sigma_rate = 5
 freq = 100
 recycleFreq = 30
 recycled_particles = 0
+recycleRate = 0.3
 l0=1.1 # touching distance of molecules
 img_names = []
 for t in range(n_iter):
@@ -78,7 +79,7 @@ for t in range(n_iter):
         arr=tarr
         print("after removing molecules")
         print(len(arr))
-        recycled_particles = int(np.round((n_part - len(arr))*0.3))
+        recycled_particles = int(np.round((n_part - len(arr))*recycleRate))
         
         # replacing the actual list and positions after removing molecules
         # adding molecules
