@@ -26,6 +26,8 @@ endo_rate = 10
 exo_rate = 12
 sigma_rate = 5
 freq = 100
+recycleFreq = 30
+recycled_particles = 0
 l0=1.1 # touching distance of molecules
 img_names = []
 for t in range(n_iter):
@@ -50,18 +52,20 @@ for t in range(n_iter):
 
  # removing molecules
         nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
+        print(nd)
         while(nd>=n_part):
             nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
-
+        # this above code used to essentially make the nd (number of removed molecules less than n_part)
         removed_ind = set()
         while(len(removed_ind)<nd):
             x = random.randint(0, n_part-1)
             removed_ind.add(x)
-
+        # removed_ind has now all the indexes that are to be removed, but error here as x can be repeated
         new_indices = []
         for i in range(n_part):
             if i not in removed_ind:
                 new_indices.append(i)
+        # above comment got taken care of here, but still if there was a repeat the nd would be more than the actual removed molecules
         tvecx=[]
         tvecy = []
         tarr=[]
@@ -72,8 +76,13 @@ for t in range(n_iter):
         vecx = tvecx
         vecy = tvecy
         arr=tarr
+        print("after removing molecules")
+        print(len(arr))
+        recycled_particles = int(np.round((n_part - len(arr))*0.3))
+        
+        # replacing the actual list and positions after removing molecules
         # adding molecules
-        na = int(np.round(random.gauss(exo_rate,sigma_rate)))
+        na = int(np.round(random.gauss(exo_rate,sigma_rate))) if exo_rate != 0 else 0
         for i in range(na):
             x = random.random()*L
             y = random.random()*L
@@ -81,8 +90,21 @@ for t in range(n_iter):
             vecy.append([y])
             arr.append((x,y))
         n_part = len(vecx)
+        print("after adding molecules")
+        print(len(arr))
+        # molecules are now added, so n_part is increased
 
-
+    # adding recyled particles
+    elif (t-recycleFreq)%freq==0:
+        # assuming constant endocytosis rate
+        for i in range(recycled_particles):
+            x = random.random()*L
+            y = random.random()*L
+            vecx.append([x])
+            vecy.append([y])
+            arr.append((x,y))
+        n_part = len(vecx)
+        exo_rate = exo_rate - recycled_particles if exo_rate - recycled_particles >= 0 else 0
     fxij = np.zeros(n_part)
     fyij = np.zeros(n_part)
     # print(n_part)
