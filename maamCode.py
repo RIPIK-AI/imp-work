@@ -23,7 +23,7 @@ for i in range(n_part):
     arr.append((x,y))
 # above function generates the arr of molecules in the graph
 endo_rate = 10
-exo_rate = 12
+exo_rate = 10
 sigma_rate = 5
 freq = 100
 recycleFreq = 30
@@ -56,6 +56,8 @@ for t in range(n_iter):
         print(nd)
         while(nd>=n_part):
             nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
+        recycled_particles = int(np.round((n_part - len(arr))*recycleRate))
+        nd -= recycled_particles
         # this above code used to essentially make the nd (number of removed molecules less than n_part)
         removed_ind = set()
         while(len(removed_ind)<nd):
@@ -79,7 +81,7 @@ for t in range(n_iter):
         arr=tarr
         print("after removing molecules")
         print(len(arr))
-        recycled_particles = int(np.round((n_part - len(arr))*recycleRate))
+        
         
         # replacing the actual list and positions after removing molecules
         # adding molecules
@@ -105,7 +107,7 @@ for t in range(n_iter):
             vecy.append([y])
             arr.append((x,y))
         n_part = len(vecx)
-        exo_rate = exo_rate - recycled_particles if exo_rate - recycled_particles >= 0 else 0
+        # exo_rate = exo_rate - recycled_particles if exo_rate - recycled_particles >= 0 else 0
     fxij = np.zeros(n_part)
     fyij = np.zeros(n_part)
     # print(n_part)
