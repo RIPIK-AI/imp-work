@@ -2,170 +2,267 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import cv2
-print("Generating random value for V between 0 and 1 ")
-del_t = 0.01
-L=20.0
-# L is the dimension of the graph
-v = 1.0
-print("V = "+str(v)+" generated")
-k = 1.0
-arr = []
-n_part = 100
-# npart is the number of molecules present on the surface
-n_iter = int(input("Enter the number of iterations :"))
-mechanism_type = str(input("Which Type of Mechanism do you want to run? A. Wild Type B. Rab11 C. RabX1 "))
-if mec
-vecx = [[] for i in range(n_part)]
-vecy = [[] for i in range(n_part)]
-for i in range(n_part):
-    x = random.random()*L
-    y = random.random()*L
-    vecx[i].append(x)
-    vecy[i].append(y)
-    arr.append((x,y))
-# above function generates the arr of molecules in the graph
-endo_rate = 12
-exo_rate = 10
-sigma_rate = 5
-freq = 100
-recycleFreq = 30
-recycled_particles = 0
-recycleRate = 0.3
-l0=1.1 # touching distance of molecules
-img_names = []
-for t in range(n_iter):
-    # print(len(arr))
-    # print("vecx is "+str(vecx))
-    # print("vecy is "+str(vecy))
-    if t%freq==0:
-        # this code runs every 100th iterations!
-        # basically saves the current configuration of the surface
-    # print("vecx is "+str(vecx))
-    # print("vecy is "+str(vecy))
-        fig, ax = plt.subplots()
-        to_printx =[]
-        to_printy =[]
-        for i in range(n_part):
-            to_printx.append(vecx[i][-1])
-            to_printy.append(vecy[i][-1])
-        ax.plot(to_printx, to_printy,'o')
-        fig.savefig(f"images_my/graph_{t}.png")
-        plt.close(fig)
-        img_names.append(f"images_my/graph_{t}.png")
+from datetime import datetime
 
- # removing molecules
-        nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
-        while(nd>=n_part):
-            nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
-        recycled_particles = int(np.round(nd*recycleRate))
-        # this above code used to essentially make the nd (number of removed molecules less than n_part)
-        removed_ind = set()
-        while(len(removed_ind)<nd):
-            x = random.randint(0, n_part-1)
-            removed_ind.add(x)
-        # removed_ind has now all the indexes that are to be removed, but error here as x can be repeated
-        new_indices = []
-        for i in range(n_part):
-            if i not in removed_ind:
-                new_indices.append(i)
-        # above comment got taken care of here, but still if there was a repeat the nd would be more than the actual removed molecules
-        tvecx=[]
-        tvecy = []
-        tarr=[]
-        for ind in new_indices:
-            tvecx.append(vecx[ind])
-            tvecy.append(vecy[ind])
-            tarr.append(arr[ind])
-        vecx = tvecx
-        vecy = tvecy
-        arr=tarr
-        print("after removing molecules")
-        print(len(arr))
-        
-        
-        # replacing the actual list and positions after removing molecules
-        # adding molecules
-        na = int(np.round(random.gauss(exo_rate,sigma_rate))) - recycled_particles
-        for i in range(na):
-            x = random.random()*L
-            y = random.random()*L
-            vecx.append([x])
-            vecy.append([y])
-            arr.append((x,y))
-        n_part = len(vecx)
-        print("after adding molecules")
-        print(len(arr))
-        # molecules are now added, so n_part is increased
+# directly recycled so would be added with small delay
+def Rab4Recycle(removed_particles_entering_rab4):
+    rab4_efficiency = 0.3
+    return int(np.round(removed_particles_entering_rab4*rab4_efficiency))
 
-    # adding recyled particles
-    elif (t+recycleFreq)%freq==0:
-        # assuming constant endocytosis rate
-        # print(recycled_particles)
-        for i in range(recycled_particles):
-            x = random.random()*L
-            y = random.random()*L
-            vecx.append([x])
-            vecy.append([y])
-            arr.append((x,y))
-        n_part = len(vecx)
-        print("after adding recycled molecules back")
-        print(len(arr))
-        # exo_rate = exo_rate - recycled_particles if exo_rate - recycled_particles >= 0 else 0
-    fxij = np.zeros(n_part)
-    fyij = np.zeros(n_part)
-    # print(n_part)
-    # print("size of vecx is "+str(len(vecx)))
-    # print("size of arr is "+str(len(arr)))
-    # print()
-    for i in range(n_part-1):
-        for j in range(i+1,n_part):
-            (xi,yi)=arr[i]
-            (xj,yj)=arr[j]
-            delxij = (xi-xj)
-            delyij = (yi-yj)
-            delxij = delxij - np.round(delxij/L)*L
-            delyij = delyij - np.round(delyij/L)*L
-            lij = np.sqrt(delxij**2.0 + delyij**2.0)
-            if lij <= 2.0*l0:
-                fij = -k*(lij-l0)
-                fxij[i] += fij*delxij/abs(lij)
-                fxij[j] -= fij*delxij/abs(lij)
-                fyij[i] += fij*delyij/abs(lij)
-                fyij[j] -= fij*delyij/abs(lij)
-    
+# sorted for recycling, so would be added with a bigger delay
+def TubularRecycle(removed_particles_entering_tubular):
+    tubular_efficiency = 0.3
+    return int(np.round(removed_particles_entering_tubular*tubular_efficiency))
+
+def wildType(n_iter, mechanism_type):
+    del_t = 0.01
+    L=20.0
+    # L is the dimension of the graph
+    v = 1.0
+    k = 1.0
+    arr = []
+    n_part = 100
+    # npart is the number of molecules present on the surface
+    vecx = [[] for i in range(n_part)]
+    vecy = [[] for i in range(n_part)]
+    # function generates the arr of molecules in the graph
     for i in range(n_part):
-        (x,y)=arr[i]
-        valid = False
-        while(not valid):
-            temp = random.random()
-            theta = 2*np.pi*temp
-            x = x + (fxij[i] + v * np.cos(theta)) * del_t
-            y = y + (fyij[i] + v * np.sin(theta)) * del_t
-            # if(x<0):
-            # x+=L
-            # if(x>L):
-            # x-=L
-            # if(y<0):
-            # y+=L
-            # if(y>L):
-            # y-=L
-            temp=True
-            valid=True
+        x = random.random()*L
+        y = random.random()*L
         vecx[i].append(x)
         vecy[i].append(y)
-        arr[i] = (x, y)
+        arr.append((x,y))
+    endo_rate = 10
+    exo_rate = 10
+    sigma_rate = 5
+    freq = 100
+    recycleFreq = 30
+    recycled_particles = 0
+    recycleFreqRab4 = 21
+    recycleFreqTubular = 41
+    recycleRate = 0.3
+    l0=1.1 # touching distance of molecules
+    img_names = []
+    for t in range(n_iter):
+        if t%freq==0:
+            # this code runs every 100th iterations!
+            # basically saves the current configuration of the surface
+            fig, ax = plt.subplots()
+            to_printx =[]
+            to_printy =[]
+            for i in range(n_part):
+                to_printx.append(vecx[i][-1])
+                to_printy.append(vecy[i][-1])
+            # plotting the molecules location on the graph
+            ax.plot(to_printx, to_printy,'o')
+            fig.savefig(f"images_my/{mechanism_type}/graph_{t}.png")
+            plt.close(fig)
+            img_names.append(f"images_my/{mechanism_type}/graph_{t}.png")
 
-print("pre-processing done!")
-# Set up video codec and output file name
-codec = cv2.VideoWriter_fourcc(*"mp4v")
-out = cv2.VideoWriter("videos_my/output.mp4", codec, 18, (640, 480))
-for i in range(len(img_names)):
-    # Read the saved image file and add it to the video
-    print(img_names)
-    img = cv2.imread(img_names[i])
-    out.write(img)
-plt.show()
-# Release the video writer and cleanup
-out.release()
-cv2.destroyAllWindows()
-print("done!")
+
+            # REMOVING MOLECULES ENDOCYTOSIS
+            nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
+            # this code used to essentially make the nd (number of removed molecules less than n_part)
+            while(nd>=n_part):
+                print("DANGER number of removed particles are greater than particles present, bleak possibility")
+                nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
+            recycled_particles = int(np.round(nd*recycleRate))
+            recycled_particles_rab4 = Rab4Recycle(nd*0.5)
+            recycled_particles_tubular = TubularRecycle(nd*0.5)
+            # print(f"number of recycled particles \n {recycled_particles}")
+            # print(f"number of recycled particles from rab4 \n {recycled_particles_rab4}")
+            # print(f"number of recycled particles from tubular \n {recycled_particles_tubular}")
+            
+            # removed_ind has now all the indexes that are to be removed, but error here as x can be repeated
+            removed_ind = set()
+            while(len(removed_ind)<nd):
+                x = random.randint(0, n_part-1)
+                removed_ind.add(x)
+
+            # above comment got taken care of here, but still if there was a repeat the nd would be more than the actual removed molecules
+            new_indices = []
+            for i in range(n_part):
+                if i not in removed_ind:
+                    new_indices.append(i)
+            
+            # replacing the actual list and positions after removing molecules
+            tvecx=[]
+            tvecy = []
+            tarr=[]
+            for ind in new_indices:
+                tvecx.append(vecx[ind])
+                tvecy.append(vecy[ind])
+                tarr.append(arr[ind])
+            vecx = tvecx
+            vecy = tvecy
+            arr=tarr
+            print(f"after removing molecules \n {len(arr)}")
+            
+
+
+            # ADDING MOLECULES EXOCYTOSIS
+            na = int(np.round(random.gauss(exo_rate,sigma_rate))) - recycled_particles
+            for i in range(na):
+                x = random.random()*L
+                y = random.random()*L
+                vecx.append([x])
+                vecy.append([y])
+                arr.append((x,y))
+            n_part = len(vecx)
+            print(f"after adding molecules \n {len(arr)}")
+            # molecules are now added, so n_part is increased
+
+
+        # ADDING RECYCLES PARTICLES BACK AFTER SOME ITERATIONS I.E RECYCLED FREQ
+        # elif (t+recycleFreq)%freq==0:
+        #     # assuming constant endocytosis rate
+        #     for i in range(recycled_particles):
+        #         x = random.random()*L
+        #         y = random.random()*L
+        #         vecx.append([x])
+        #         vecy.append([y])
+        #         arr.append((x,y))
+        #     n_part = len(vecx)
+        #     print(f"after adding recycled molecules back \n {len(arr)}")
+        elif (t+recycleFreqRab4)%freq==0:
+            # assuming constant endocytosis rate
+            for i in range(recycled_particles_rab4):
+                x = random.random()*L
+                y = random.random()*L
+                vecx.append([x])
+                vecy.append([y])
+                arr.append((x,y))
+            n_part = len(vecx)
+            print(f"after adding recycled molecules from rab4 back \n {len(arr)}")
+        elif (t+recycleFreqTubular)%freq==0:
+            # assuming constant endocytosis rate
+            for i in range(recycled_particles_tubular):
+                x = random.random()*L
+                y = random.random()*L
+                vecx.append([x])
+                vecy.append([y])
+                arr.append((x,y))
+            n_part = len(vecx)
+            print(f"after adding recycled molecules from tubular back \n {len(arr)}")
+
+
+        # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
+        fxij = np.zeros(n_part)
+        fyij = np.zeros(n_part)
+        for i in range(n_part-1):
+            for j in range(i+1,n_part):
+                (xi,yi)=arr[i]
+                (xj,yj)=arr[j]
+                delxij = (xi-xj)
+                delyij = (yi-yj)
+                delxij = delxij - np.round(delxij/L)*L
+                delyij = delyij - np.round(delyij/L)*L
+                lij = np.sqrt(delxij**2.0 + delyij**2.0)
+                if lij <= 2.0*l0:
+                    fij = -k*(lij-l0)
+                    fxij[i] += fij*delxij/abs(lij)
+                    fxij[j] -= fij*delxij/abs(lij)
+                    fyij[i] += fij*delyij/abs(lij)
+                    fyij[j] -= fij*delyij/abs(lij)
+        for i in range(n_part):
+            (x,y)=arr[i]
+            valid = False
+            while(not valid):
+                temp = random.random()
+                theta = 2*np.pi*temp
+                x = x + (fxij[i] + v * np.cos(theta)) * del_t
+                y = y + (fyij[i] + v * np.sin(theta)) * del_t
+                temp=True
+                valid=True
+            vecx[i].append(x)
+            vecy[i].append(y)
+            arr[i] = (x, y)
+    return img_names
+def Rab11(n_iter, mechanism_type):
+    del_t = 0.01
+    L=20.0
+    # L is the dimension of the graph
+    v = 1.0
+    k = 1.0
+    arr = []
+    n_part = 100
+    # npart is the number of molecules present on the surface
+    vecx = [[] for i in range(n_part)]
+    vecy = [[] for i in range(n_part)]
+    # function generates the arr of molecules in the graph
+    for i in range(n_part):
+        x = random.random()*L
+        y = random.random()*L
+        vecx[i].append(x)
+        vecy[i].append(y)
+        arr.append((x,y))
+    endo_rate = 12
+    exo_rate = 10
+    sigma_rate = 5
+    freq = 100
+    recycleFreq = 30
+    recycled_particles = 0
+    recycleRate = 0.3
+    l0=1.1 # touching distance of molecules
+    img_names = []  
+    return img_names 
+def RabX1(n_iter, mechanism_type):
+    del_t = 0.01
+    L=20.0
+    # L is the dimension of the graph
+    v = 1.0
+    k = 1.0
+    arr = []
+    n_part = 100
+    # npart is the number of molecules present on the surface
+    vecx = [[] for i in range(n_part)]
+    vecy = [[] for i in range(n_part)]
+    # function generates the arr of molecules in the graph
+    for i in range(n_part):
+        x = random.random()*L
+        y = random.random()*L
+        vecx[i].append(x)
+        vecy[i].append(y)
+        arr.append((x,y))
+    endo_rate = 12
+    exo_rate = 10
+    sigma_rate = 5
+    freq = 100
+    recycleFreq = 30
+    recycled_particles = 0
+    recycleRate = 0.3
+    l0=1.1 # touching distance of molecules
+    img_names = []
+    return img_names
+
+def modelECAD():
+    currentDate = datetime.now().date()
+    currentTime = datetime.now().time()
+    print("Generating random value for V between 0 and 1 ")
+    n_iter = int(input("Enter the number of iterations :"))
+    mechanism_type = str(input("Which Type of Mechanism do you want to run? A. Wild Type B. Rab11 C. RabX1 "))
+    img_names = []
+    
+    if mechanism_type == "A" or mechanism_type == "a":
+        mechanism_type = "wild_type"
+        img_names = wildType(n_iter, mechanism_type)
+    elif mechanism_type == "B" or mechanism_type == "b":
+        mechanism_type = "rab11"
+        img_names = Rab11(n_iter, mechanism_type)
+    elif mechanism_type == "C" or mechanism_type == "c":
+        mechanism_type = "rabx1"
+        img_names = RabX1(n_iter, mechanism_type)
+
+    print("pre-processing done!")
+    codec = cv2.VideoWriter_fourcc(*"mp4v")
+    out = cv2.VideoWriter(f"videos_my/{mechanism_type}/output {currentDate} {currentTime}.mp4", codec, 18, (640, 480))
+    for i in range(len(img_names)):
+        print(img_names)
+        img = cv2.imread(img_names[i])
+        out.write(img)
+    plt.show()
+    out.release()
+    cv2.destroyAllWindows()
+    print("done!")
+
+modelECAD()
