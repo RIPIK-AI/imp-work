@@ -244,7 +244,9 @@ def Rab11(n_iter, mechanism_type):
                 nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
             # recycled_particles = int(np.round(nd*recycleRate))
             recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=rab4_efficiency)
+            recycled_particles_rab4_supposed = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=0.2)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
+            recycled_particles_tubular_supposed = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=0.4)
             # print(f"number of recycled particles \n {recycled_particles}")
             # print(f"number of recycled particles from rab4 \n {recycled_particles_rab4}")
             # print(f"number of recycled particles from tubular \n {recycled_particles_tubular}")
@@ -283,7 +285,7 @@ def Rab11(n_iter, mechanism_type):
 
 
             # ADDING MOLECULES EXOCYTOSIS
-            na = int(np.round(random.gauss(exo_rate,sigma_rate))) - (recycled_particles_rab4 + recycled_particles_tubular)
+            na = int(np.round(random.gauss(exo_rate,sigma_rate))) - (recycled_particles_rab4_supposed + recycled_particles_tubular_supposed)
             for i in range(na):
                 x = random.random()*L
                 y = random.random()*L
@@ -422,7 +424,9 @@ def RabX1(n_iter, mechanism_type):
                 nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
             # recycled_particles = int(np.round(nd*recycleRate))
             recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=rab4_efficiency)
+            recycled_particles_rab4_supposed = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=0.2)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
+            recycled_particles_tubular_supposed = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=0.4)
             # print(f"number of recycled particles \n {recycled_particles}")
             # print(f"number of recycled particles from rab4 \n {recycled_particles_rab4}")
             # print(f"number of recycled particles from tubular \n {recycled_particles_tubular}")
@@ -461,7 +465,7 @@ def RabX1(n_iter, mechanism_type):
 
 
             # ADDING MOLECULES EXOCYTOSIS
-            na = int(np.round(random.gauss(exo_rate,sigma_rate))) - (recycled_particles_rab4 + recycled_particles_tubular)
+            na = int(np.round(random.gauss(exo_rate,sigma_rate))) - (recycled_particles_rab4_supposed + recycled_particles_tubular_supposed)
             for i in range(na):
                 x = random.random()*L
                 y = random.random()*L
