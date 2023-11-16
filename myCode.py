@@ -392,7 +392,7 @@ def RabX1(n_iter, mechanism_type):
     freq = 100
     recycleFreq = 30
     recycleFreqRab4 = 21
-    rab4_efficiency = 0.2
+    rab4_efficiency = 0.4
     recycleFreqTubular = 41
     tubular_efficiency = 0.08
     recycled_particles = 0
@@ -448,10 +448,10 @@ def RabX1(n_iter, mechanism_type):
             tvecy = []
             tarr=[]
             if len(new_indices) <= 50:
-                rab4_efficiency = 0.3
+                rab4_efficiency = 0.5
             elif len(new_indices) >= 75:
                 print("len of new_indices greater than 75")
-                rab4_efficiency = 0.1
+                rab4_efficiency = 0.3
             for ind in new_indices:
                 tvecx.append(vecx[ind])
                 tvecy.append(vecy[ind])
