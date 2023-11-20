@@ -15,7 +15,11 @@ def TubularRecycle(removed_particles_entering_tubular, tubular_efficiency):
     return int(np.round(removed_particles_entering_tubular*tubular_efficiency))
 
 def wildType(n_iter, mechanism_type):
+    currentDate = datetime.now().date()
+    currentTime = datetime.now().time()
+    currentTime = str(currentTime)[:8]
     part_arr = []
+    numbers = []
     print("WILD TYPE CALLED")
     del_t = 0.01
     L=20.0
@@ -40,9 +44,13 @@ def wildType(n_iter, mechanism_type):
     freq = 100
     recycleFreq = 30
     recycled_particles = 0
-    recycleFreqRab4 = 21
     rab4_efficiency = 0.2
-    recycleFreqTubular = 41
+
+    lamRecycleFreqRab4 = 20
+    lamRecycleFreqTubular = 40
+    recycleFreqTubular = 40 
+    recycleFreqRab4 = 20
+
     tubular_efficiency = 0.4
     recycleRate = 0.3
     l0=1.1 # touching distance of molecules
@@ -71,6 +79,8 @@ def wildType(n_iter, mechanism_type):
                 print("DANGER number of removed particles are greater than particles present, bleak possibility")
                 nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
             # recycled_particles = int(np.round(nd*recycleRate))
+            recycleFreqTubular = np.random.poisson(lam=lamRecycleFreqTubular)
+            recycleFreqRab4 = np.random.poisson(lam=lamRecycleFreqRab4)
             recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=rab4_efficiency)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
             # print(f"number of recycled particles \n {recycled_particles}")
@@ -149,6 +159,8 @@ def wildType(n_iter, mechanism_type):
             n_part = len(vecx)
             print(f"after adding recycled molecules from tubular back \n {len(arr)}")
 
+        if t%10 == 0:
+            numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
         fxij = np.zeros(n_part)
@@ -185,9 +197,19 @@ def wildType(n_iter, mechanism_type):
     for part in range(0, len(part_arr)):
         total_sum += part_arr[part]
     print(total_sum/len(part_arr))
+    plt.plot(numbers, marker='o')
+    plt.title('Line Graph of E-cad molecules on surface vs Time')
+    plt.xlabel('Time (Every 10th iteration)')
+    plt.ylabel('Number of Particles')
+    plt.grid(True)
+    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
     return img_names
 def Rab11(n_iter, mechanism_type):
+    currentDate = datetime.now().date()
+    currentTime = datetime.now().time()
+    currentTime = str(currentTime)[:8]
     part_arr = []
+    numbers = []
     print("RAB11 CALLED")
     del_t = 0.01
     L=20.0
@@ -211,9 +233,13 @@ def Rab11(n_iter, mechanism_type):
     sigma_rate = 5
     freq = 100
     recycleFreq = 30
-    recycleFreqRab4 = 21
+
+    lamRecycleFreqRab4 = 20
+    lamRecycleFreqTubular = 40
+    recycleFreqTubular = 40 
+    recycleFreqRab4 = 20
+
     rab4_efficiency = 0.2
-    recycleFreqTubular = 41
     tubular_efficiency = 0.4
     recycled_particles = 0
     recycleRate = 0.3
@@ -243,6 +269,8 @@ def Rab11(n_iter, mechanism_type):
                 print("DANGER number of removed particles are greater than particles present, bleak possibility")
                 nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
             # recycled_particles = int(np.round(nd*recycleRate))
+            recycleFreqTubular = np.random.poisson(lam=lamRecycleFreqTubular)
+            recycleFreqRab4 = np.random.poisson(lam=lamRecycleFreqRab4)
             recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=rab4_efficiency)
             recycled_particles_rab4_supposed = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=0.2)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
@@ -328,7 +356,8 @@ def Rab11(n_iter, mechanism_type):
         #         arr.append((x,y))
         #     n_part = len(vecx)
         #     print(f"after adding recycled molecules from tubular back \n {len(arr)}")
-
+        if t%10 == 0:
+            numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
         fxij = np.zeros(n_part)
@@ -361,13 +390,23 @@ def Rab11(n_iter, mechanism_type):
             vecx[i].append(x)
             vecy[i].append(y)
             arr[i] = (x, y)
+    plt.plot(numbers, marker='o')
+    plt.title('Line Graph of E-cad molecules on surface vs Time')
+    plt.xlabel('Time (Every 10th iteration)')
+    plt.ylabel('Number of Particles')
+    plt.grid(True)
+    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
     total_sum = 0
     for part in range(0, len(part_arr)):
         total_sum += part_arr[part]
     print(total_sum/len(part_arr))
     return img_names
 def RabX1(n_iter, mechanism_type):
+    currentDate = datetime.now().date()
+    currentTime = datetime.now().time()
+    currentTime = str(currentTime)[:8]
     part_arr = []
+    numbers = []
     print("RABX1 CALLED")
     del_t = 0.01
     L=20.0
@@ -391,9 +430,11 @@ def RabX1(n_iter, mechanism_type):
     sigma_rate = 5
     freq = 100
     recycleFreq = 30
-    recycleFreqRab4 = 21
+    lamRecycleFreqRab4 = 20
+    lamRecycleFreqTubular = 40
+    recycleFreqTubular = 40 
+    recycleFreqRab4 = 20
     rab4_efficiency = 0.4
-    recycleFreqTubular = 41
     tubular_efficiency = 0.08
     recycled_particles = 0
     recycleRate = 0.3
@@ -423,6 +464,8 @@ def RabX1(n_iter, mechanism_type):
                 print("DANGER number of removed particles are greater than particles present, bleak possibility")
                 nd = int(np.round(random.gauss(endo_rate,sigma_rate)))
             # recycled_particles = int(np.round(nd*recycleRate))
+            recycleFreqTubular = np.random.poisson(lam=lamRecycleFreqTubular)
+            recycleFreqRab4 = np.random.poisson(lam=lamRecycleFreqRab4)
             recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=rab4_efficiency)
             recycled_particles_rab4_supposed = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=0.2)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
@@ -487,8 +530,9 @@ def RabX1(n_iter, mechanism_type):
         #         vecy.append([y])
         #         arr.append((x,y))
         #     n_part = len(vecx)
-        #     print(f"after adding recycled molecules back \n {len(arr)}")
+            print(f"after adding recycled molecules back \n {len(arr)}")
         elif (t+recycleFreqRab4)%freq==0:
+            # print(recycleFreqRab4)
             # assuming constant endocytosis rate
             for i in range(recycled_particles_rab4):
                 x = random.random()*L
@@ -499,6 +543,7 @@ def RabX1(n_iter, mechanism_type):
             n_part = len(vecx)
             print(f"after adding recycled molecules from rab4 back \n {len(arr)}")
         elif (t+recycleFreqTubular)%freq==0:
+            print(recycleFreqTubular)
             # assuming constant endocytosis rate
             for i in range(recycled_particles_tubular):
                 x = random.random()*L
@@ -507,8 +552,9 @@ def RabX1(n_iter, mechanism_type):
                 vecy.append([y])
                 arr.append((x,y))
             n_part = len(vecx)
-            print(f"after adding recycled molecules from tubular back \n {len(arr)}")
-
+            # print(f"after adding recycled molecules from tubular back \n {len(arr)}")
+        if t%10 == 0:
+            numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
         fxij = np.zeros(n_part)
@@ -541,6 +587,13 @@ def RabX1(n_iter, mechanism_type):
             vecx[i].append(x)
             vecy[i].append(y)
             arr[i] = (x, y)
+    
+    plt.plot(numbers, marker='o')
+    plt.title('Line Graph of E-cad molecules on surface vs Time')
+    plt.xlabel('Time (Every 10th iteration)')
+    plt.ylabel('Number of Particles')
+    plt.grid(True)
+    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
     total_sum = 0
     for part in range(0, len(part_arr)):
         total_sum += part_arr[part]
@@ -577,3 +630,4 @@ def modelECAD():
     print("done!")
 
 modelECAD()
+
