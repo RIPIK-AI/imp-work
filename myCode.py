@@ -118,10 +118,8 @@ def wildType(n_iter, mechanism_type):
             vecx = tvecx
             vecy = tvecy
             arr=tarr
-            print(f"after removing molecules \n {len(arr)}")
+            # print(f"after removing molecules \n {len(arr)}")
             
-
-
             # ADDING MOLECULES EXOCYTOSIS
             na = int(np.round(random.gauss(exo_rate,sigma_rate))) - (recycled_particles_rab4 + recycled_particles_tubular)
             for i in range(na):
@@ -131,7 +129,7 @@ def wildType(n_iter, mechanism_type):
                 vecy.append([y])
                 arr.append((x,y))
             n_part = len(vecx)
-            print(f"after adding molecules \n {len(arr)}")
+            # print(f"after adding molecules \n {len(arr)}")
             # molecules are now added, so n_part is increased
             part_arr.append(n_part)
 
@@ -147,6 +145,7 @@ def wildType(n_iter, mechanism_type):
         #     n_part = len(vecx)
         #     print(f"after adding recycled molecules back \n {len(arr)}")
         elif (t+recycleFreqRab4)%freq==0:
+            print(f"recycle freq for Rab 4 is \n {recycleFreqRab4}")
             # assuming constant endocytosis rate
             for i in range(recycled_particles_rab4):
                 x = random.random()*L
@@ -155,8 +154,9 @@ def wildType(n_iter, mechanism_type):
                 vecy.append([y])
                 arr.append((x,y))
             n_part = len(vecx)
-            print(f"after adding recycled molecules from rab4 back \n {len(arr)}")
+            # print(f"after adding recycled molecules from rab4 back \n {len(arr)}")
         elif (t+recycleFreqTubular)%freq==0:
+            print(f"recycle freq for Tubular is \n {recycleFreqTubular}")
             # assuming constant endocytosis rate
             for i in range(recycled_particles_tubular):
                 x = random.random()*L
@@ -165,51 +165,52 @@ def wildType(n_iter, mechanism_type):
                 vecy.append([y])
                 arr.append((x,y))
             n_part = len(vecx)
-            print(f"after adding recycled molecules from tubular back \n {len(arr)}")
+            # print(f"after adding recycled molecules from tubular back \n {len(arr)}")
 
         if t%10 == 0:
             numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
-        fxij = np.zeros(n_part)
-        fyij = np.zeros(n_part)
-        for i in range(n_part-1):
-            for j in range(i+1,n_part):
-                (xi,yi)=arr[i]
-                (xj,yj)=arr[j]
-                delxij = (xi-xj)
-                delyij = (yi-yj)
-                delxij = delxij - np.round(delxij/L)*L
-                delyij = delyij - np.round(delyij/L)*L
-                lij = np.sqrt(delxij**2.0 + delyij**2.0)
-                if lij <= 2.0*l0:
-                    fij = -k*(lij-l0)
-                    fxij[i] += fij*delxij/abs(lij)
-                    fxij[j] -= fij*delxij/abs(lij)
-                    fyij[i] += fij*delyij/abs(lij)
-                    fyij[j] -= fij*delyij/abs(lij)
-        for i in range(n_part):
-            (x,y)=arr[i]
-            valid = False
-            while(not valid):
-                temp = random.random()
-                theta = 2*np.pi*temp
-                x = x + (fxij[i] + v * np.cos(theta)) * del_t
-                y = y + (fyij[i] + v * np.sin(theta)) * del_t
-                temp=True
-                valid=True
-            vecx[i].append(x)
-            vecy[i].append(y)
-            arr[i] = (x, y)
+        # fxij = np.zeros(n_part)
+        # fyij = np.zeros(n_part)
+        # for i in range(n_part-1):
+        #     for j in range(i+1,n_part):
+        #         (xi,yi)=arr[i]
+        #         (xj,yj)=arr[j]
+        #         delxij = (xi-xj)
+        #         delyij = (yi-yj)
+        #         delxij = delxij - np.round(delxij/L)*L
+        #         delyij = delyij - np.round(delyij/L)*L
+        #         lij = np.sqrt(delxij**2.0 + delyij**2.0)
+        #         if lij <= 2.0*l0:
+        #             fij = -k*(lij-l0)
+        #             fxij[i] += fij*delxij/abs(lij)
+        #             fxij[j] -= fij*delxij/abs(lij)
+        #             fyij[i] += fij*delyij/abs(lij)
+        #             fyij[j] -= fij*delyij/abs(lij)
+        # for i in range(n_part):
+        #     (x,y)=arr[i]
+        #     valid = False
+        #     while(not valid):
+        #         temp = random.random()
+        #         theta = 2*np.pi*temp
+        #         x = x + (fxij[i] + v * np.cos(theta)) * del_t
+        #         y = y + (fyij[i] + v * np.sin(theta)) * del_t
+        #         temp=True
+        #         valid=True
+        #     vecx[i].append(x)
+        #     vecy[i].append(y)
+        #     arr[i] = (x, y)
     total_sum = 0
     for part in range(0, len(part_arr)):
         total_sum += part_arr[part]
     print(total_sum/len(part_arr))
-    plt.plot(numbers, marker='o')
+    plt.figure(figsize=(10,10))
+    plt.plot(numbers)
+    plt.ylim(bottom=0)
     plt.title('Line Graph of E-cad molecules on surface vs Time')
     plt.xlabel('Time (Every 10th iteration)')
     plt.ylabel('Number of Particles')
-    plt.grid(True)
     plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
     return img_names
 def Rab11(n_iter, mechanism_type):
@@ -364,50 +365,52 @@ def Rab11(n_iter, mechanism_type):
         #         arr.append((x,y))
         #     n_part = len(vecx)
         #     print(f"after adding recycled molecules from tubular back \n {len(arr)}")
-        if t%10 == 0:
+        if t%100 == 0:
             numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
-        fxij = np.zeros(n_part)
-        fyij = np.zeros(n_part)
-        for i in range(n_part-1):
-            for j in range(i+1,n_part):
-                (xi,yi)=arr[i]
-                (xj,yj)=arr[j]
-                delxij = (xi-xj)
-                delyij = (yi-yj)
-                delxij = delxij - np.round(delxij/L)*L
-                delyij = delyij - np.round(delyij/L)*L
-                lij = np.sqrt(delxij**2.0 + delyij**2.0)
-                if lij <= 2.0*l0:
-                    fij = -k*(lij-l0)
-                    fxij[i] += fij*delxij/abs(lij)
-                    fxij[j] -= fij*delxij/abs(lij)
-                    fyij[i] += fij*delyij/abs(lij)
-                    fyij[j] -= fij*delyij/abs(lij)
-        for i in range(n_part):
-            (x,y)=arr[i]
-            valid = False
-            while(not valid):
-                temp = random.random()
-                theta = 2*np.pi*temp
-                x = x + (fxij[i] + v * np.cos(theta)) * del_t
-                y = y + (fyij[i] + v * np.sin(theta)) * del_t
-                temp=True
-                valid=True
-            vecx[i].append(x)
-            vecy[i].append(y)
-            arr[i] = (x, y)
-    plt.plot(numbers, marker='o')
-    plt.title('Line Graph of E-cad molecules on surface vs Time')
-    plt.xlabel('Time (Every 10th iteration)')
-    plt.ylabel('Number of Particles')
-    plt.grid(True)
-    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
+        # fxij = np.zeros(n_part)
+        # fyij = np.zeros(n_part)
+        # for i in range(n_part-1):
+        #     for j in range(i+1,n_part):
+        #         (xi,yi)=arr[i]
+        #         (xj,yj)=arr[j]
+        #         delxij = (xi-xj)
+        #         delyij = (yi-yj)
+        #         delxij = delxij - np.round(delxij/L)*L
+        #         delyij = delyij - np.round(delyij/L)*L
+        #         lij = np.sqrt(delxij**2.0 + delyij**2.0)
+        #         if lij <= 2.0*l0:
+        #             fij = -k*(lij-l0)
+        #             fxij[i] += fij*delxij/abs(lij)
+        #             fxij[j] -= fij*delxij/abs(lij)
+        #             fyij[i] += fij*delyij/abs(lij)
+        #             fyij[j] -= fij*delyij/abs(lij)
+        # for i in range(n_part):
+        #     (x,y)=arr[i]
+        #     valid = False
+        #     while(not valid):
+        #         temp = random.random()
+        #         theta = 2*np.pi*temp
+        #         x = x + (fxij[i] + v * np.cos(theta)) * del_t
+        #         y = y + (fyij[i] + v * np.sin(theta)) * del_t
+        #         temp=True
+        #         valid=True
+        #     vecx[i].append(x)
+        #     vecy[i].append(y)
+        #     arr[i] = (x, y)
     total_sum = 0
     for part in range(0, len(part_arr)):
         total_sum += part_arr[part]
     print(total_sum/len(part_arr))
+    plt.figure(figsize=(10,10))
+    plt.plot(numbers)
+    plt.ylim(bottom=0)
+    plt.title('Line Graph of E-cad molecules on surface vs Time')
+    plt.xlabel('Time (Every 10th iteration)')
+    plt.ylabel('Number of Particles')
+    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
+    
     return img_names
 def RabX1(n_iter, mechanism_type):
     currentDate = datetime.now().date()
@@ -565,47 +568,47 @@ def RabX1(n_iter, mechanism_type):
             numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
-        fxij = np.zeros(n_part)
-        fyij = np.zeros(n_part)
-        for i in range(n_part-1):
-            for j in range(i+1,n_part):
-                (xi,yi)=arr[i]
-                (xj,yj)=arr[j]
-                delxij = (xi-xj)
-                delyij = (yi-yj)
-                delxij = delxij - np.round(delxij/L)*L
-                delyij = delyij - np.round(delyij/L)*L
-                lij = np.sqrt(delxij**2.0 + delyij**2.0)
-                if lij <= 2.0*l0:
-                    fij = -k*(lij-l0)
-                    fxij[i] += fij*delxij/abs(lij)
-                    fxij[j] -= fij*delxij/abs(lij)
-                    fyij[i] += fij*delyij/abs(lij)
-                    fyij[j] -= fij*delyij/abs(lij)
-        for i in range(n_part):
-            (x,y)=arr[i]
-            valid = False
-            while(not valid):
-                temp = random.random()
-                theta = 2*np.pi*temp
-                x = x + (fxij[i] + v * np.cos(theta)) * del_t
-                y = y + (fyij[i] + v * np.sin(theta)) * del_t
-                temp=True
-                valid=True
-            vecx[i].append(x)
-            vecy[i].append(y)
-            arr[i] = (x, y)
-    
-    plt.plot(numbers, marker='o')
-    plt.title('Line Graph of E-cad molecules on surface vs Time')
-    plt.xlabel('Time (Every 10th iteration)')
-    plt.ylabel('Number of Particles')
-    plt.grid(True)
-    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
+        # fxij = np.zeros(n_part)
+        # fyij = np.zeros(n_part)
+        # for i in range(n_part-1):
+        #     for j in range(i+1,n_part):
+        #         (xi,yi)=arr[i]
+        #         (xj,yj)=arr[j]
+        #         delxij = (xi-xj)
+        #         delyij = (yi-yj)
+        #         delxij = delxij - np.round(delxij/L)*L
+        #         delyij = delyij - np.round(delyij/L)*L
+        #         lij = np.sqrt(delxij**2.0 + delyij**2.0)
+        #         if lij <= 2.0*l0:
+        #             fij = -k*(lij-l0)
+        #             fxij[i] += fij*delxij/abs(lij)
+        #             fxij[j] -= fij*delxij/abs(lij)
+        #             fyij[i] += fij*delyij/abs(lij)
+        #             fyij[j] -= fij*delyij/abs(lij)
+        # for i in range(n_part):
+        #     (x,y)=arr[i]
+        #     valid = False
+        #     while(not valid):
+        #         temp = random.random()
+        #         theta = 2*np.pi*temp
+        #         x = x + (fxij[i] + v * np.cos(theta)) * del_t
+        #         y = y + (fyij[i] + v * np.sin(theta)) * del_t
+        #         temp=True
+        #         valid=True
+        #     vecx[i].append(x)
+        #     vecy[i].append(y)
+        #     arr[i] = (x, y)
     total_sum = 0
     for part in range(0, len(part_arr)):
         total_sum += part_arr[part]
     print(total_sum/len(part_arr))
+    plt.figure(figsize=(10,10))
+    plt.plot(numbers)
+    plt.ylim(bottom=0)
+    plt.title('Line Graph of E-cad molecules on surface vs Time')
+    plt.xlabel('Time (Every 10th iteration)')
+    plt.ylabel('Number of Particles')
+    plt.savefig(f"graphs/{mechanism_type}/graph_{currentDate} {currentTime}.png")
     return img_names
 
 def modelECAD():
