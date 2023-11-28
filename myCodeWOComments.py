@@ -359,4 +359,29 @@ def modelECAD():
     out.release()
     cv2.destroyAllWindows()
     print("done!")
-modelECAD()
+# modelECAD()
+
+# Plotting the inverse sigmoid function
+
+# Define the inverse sigmoid function
+def inverse_sigmoid(x):
+    return 1 - 1 / (1 + np.exp(-x))
+
+# Generate x values for plotting
+x_values = np.linspace(-10, 10, 300)
+y_values = inverse_sigmoid(x_values)
+
+# Plotting
+plt.figure(figsize=(10, 6))
+plt.plot(x_values, y_values, label='Inverse Sigmoid Function')
+plt.title('Rab4 Efficiency vs Number of Particles at Cell Surface')
+plt.xlabel('Number of Particles at Cell Surface')
+plt.ylabel('Rab4 Efficiency')
+plt.grid(True)
+# plt.gca().set_xlabel('')
+# plt.gca().set_ylabel('')
+
+# Remove x and y axis tick marks
+plt.gca().set_xticks([])
+plt.gca().set_yticks([])
+plt.show()

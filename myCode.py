@@ -22,12 +22,21 @@ def Rab4Efficiency(n_part):
     else:
         return -0.005 * n_part + 0.7
 
+def RemoveRab4Efficiency(n_part):
+    if n_part < 40:
+        return 0.5
+    elif n_part > 100:
+        return 0.2
+    else:
+        return -0.005 * n_part + 0.7
+
 def wildType(n_iter, mechanism_type):
     currentDate = datetime.now().date()
     currentTime = datetime.now().time()
     currentTime = str(currentTime)[:8]
     part_arr = []
     numbers = []
+    rab4Number = []
     print("WILD TYPE CALLED")
     del_t = 0.01
     L=20.0
@@ -89,7 +98,9 @@ def wildType(n_iter, mechanism_type):
             # recycled_particles = int(np.round(nd*recycleRate))
             recycleFreqTubular = np.random.poisson(lam=lamRecycleFreqTubular)
             recycleFreqRab4 = np.random.poisson(lam=lamRecycleFreqRab4)
-            recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=Rab4Efficiency(n_part))
+            newValue = Rab4Efficiency(n_part)
+            rab4Number.append(newValue)
+            recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=newValue)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
             # print(f"number of recycled particles \n {recycled_particles}")
             # print(f"number of recycled particles from rab4 \n {recycled_particles_rab4}")
@@ -219,6 +230,7 @@ def Rab11(n_iter, mechanism_type):
     currentTime = str(currentTime)[:8]
     part_arr = []
     numbers = []
+    rab4Number = []
     print("RAB11 CALLED")
     del_t = 0.01
     L=20.0
@@ -280,7 +292,9 @@ def Rab11(n_iter, mechanism_type):
             # recycled_particles = int(np.round(nd*recycleRate))
             recycleFreqTubular = np.random.poisson(lam=lamRecycleFreqTubular)
             recycleFreqRab4 = np.random.poisson(lam=lamRecycleFreqRab4)
-            recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=Rab4Efficiency(n_part))
+            newValue = Rab4Efficiency(n_part)
+            rab4Number.append(newValue)
+            recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=newValue)
             recycled_particles_rab4_supposed = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=0.2)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
             recycled_particles_tubular_supposed = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=0.4)
@@ -365,7 +379,7 @@ def Rab11(n_iter, mechanism_type):
         #         arr.append((x,y))
         #     n_part = len(vecx)
         #     print(f"after adding recycled molecules from tubular back \n {len(arr)}")
-        if t%100 == 0:
+        if t%10 == 0:
             numbers.append(n_part)
 
         # DONT CHANGE CALCULATING FORCES AND PLOTTING THE MOLECULES LOCATION EACH ITERATION
@@ -418,6 +432,7 @@ def RabX1(n_iter, mechanism_type):
     currentTime = str(currentTime)[:8]
     part_arr = []
     numbers = []
+    rab4number = []
     print("RABX1 CALLED")
     del_t = 0.01
     L=20.0
@@ -477,7 +492,9 @@ def RabX1(n_iter, mechanism_type):
             # recycled_particles = int(np.round(nd*recycleRate))
             recycleFreqTubular = np.random.poisson(lam=lamRecycleFreqTubular)
             recycleFreqRab4 = np.random.poisson(lam=lamRecycleFreqRab4)
-            recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=Rab4Efficiency(n_part))
+            newValue = RemoveRab4Efficiency(n_part)
+            rab4number.append(newValue)
+            recycled_particles_rab4 = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=newValue)
             recycled_particles_rab4_supposed = Rab4Recycle(removed_particles_entering_rab4= nd*0.5, rab4_efficiency=0.2)
             recycled_particles_tubular = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=tubular_efficiency)
             recycled_particles_tubular_supposed = TubularRecycle(removed_particles_entering_tubular=nd*0.5, tubular_efficiency=0.4)
@@ -616,7 +633,7 @@ def modelECAD():
     currentTime = datetime.now().time()
     print("Generating random value for V between 0 and 1 ")
     n_iter = int(input("Enter the number of iterations :"))
-    mechanism_type = str(input("Which Type of Mechanism do you want to run? A. Wild Type B. Rab11 C. RabX1 "))
+    mechanism_type = str(input("Which Type of Mechanism do you want to run? A. Wild Type B. Rab11 C. RabX1 D. All"))
     img_names = []
     
     if mechanism_type == "A" or mechanism_type == "a":
@@ -628,7 +645,23 @@ def modelECAD():
     elif mechanism_type == "C" or mechanism_type == "c":
         mechanism_type = "rabx1"
         img_names = RabX1(n_iter, mechanism_type)
-
+    elif mechanism_type == "D" or mechanism_type == "d":
+        mechanism_type = "rabx1"
+        rab4numberX1 = RabX1(n_iter, mechanism_type)
+        mechanism_type = "rab11"
+        rab4number11 = Rab11(n_iter, mechanism_type)
+        mechanism_type = "wild_type"
+        rab4numberWT = wildType(n_iter, mechanism_type)
+        plt.figure()
+        asd = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+        plt.plot(rab4numberX1, label = "RabX1", linestyle = 'dashed', color = "blue")
+        plt.plot(rab4number11, label = "Rab11", color = "green")
+        plt.plot(rab4numberWT, label = "Wild Type", color = "grey")
+        plt.ylim(bottom=0)
+        plt.title('Line Graph of Rab4 Efficiency vs Time')
+        plt.xlabel('Time (Every 10th iteration)')
+        plt.ylabel('Rab4 Efficiency')
+        plt.savefig(f"graphs/rab4/all_{currentDate} {currentTime}.png")
     print("pre-processing done!")
     codec = cv2.VideoWriter_fourcc(*"mp4v")
     out = cv2.VideoWriter(f"videos_my/{mechanism_type}/output {currentDate} {currentTime}.mp4", codec, 18, (640, 480))
